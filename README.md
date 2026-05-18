@@ -13,33 +13,23 @@
 
 ## 项目目录
 
-~~~text
+```text
 RoBERTa-TextCNN-WebAttackDetection/
 │
 ├── README.md
-├── PROJECT_NOTICE.md
-├── requirements.txt
-├── .gitignore
-│
-├── dapt/
-│   ├── prepare_owasp_corpus.py
-│   ├── prepare_honeypot_corpus.py
-│   ├── merge_pretrain_corpus.py
-│   └── train_mlm.py
 │
 ├── classification/
 │   ├── config.py
 │   ├── dataset.py
-│   ├── model.py
-│   ├── train.py
 │   ├── evaluate.py
+│   ├── model.py
 │   ├── predict.py
+│   ├── train.py
 │   │
 │   ├── data_process/
 │   │   ├── extract_csic2012.py
 │   │   ├── extract_pkdd2007.py
-│   │   ├── merge_datasets.py
-│   │   
+│   │   └── merge_datasets.py
 │   │
 │   ├── common/
 │   │   ├── labels.py
@@ -56,55 +46,49 @@ RoBERTa-TextCNN-WebAttackDetection/
 │       ├── train_textcnn.py
 │       └── train_bilstm.py
 │
-├── utils/
-│   ├── __init__.py
-│   └── utils.py
+├── dapt/
+│   ├── prepare_owasp_corpus.py
+│   ├── prepare_honeypot_corpus.py
+│   ├── merge_pretrain_corpus.py
+│   └── train_mlm.py
 │
-├── data/
-│   ├── README.md
-│   ├── raw/
-│   ├── processed/
-│   └── samples/
-│
-└── outputs/
-    ├── README.md
-    ├── dapt_lr_search/
-    ├── classification/
-    └── baselines/
-~~~
+└── utils/
+    ├── metrics.py
+    ├── seed.py
+    └── utils.py
+```
 
-## 4. 模块说明
+## 模块说明
 
-### 4.1 数据预处理模块
+### 数据预处理模块
 
 数据预处理代码主要位于：
 
-~~~text
+```text
 classification/data_process/
-utils/decode_utils.py
-~~~
+```
 
 其中：
 
 - `extract_csic2012.py`：用于解析 CSIC 2012 数据集中的 HTTP 请求样本；
 - `extract_pkdd2007.py`：用于解析 PKDD 2007 数据集中的 HTTP 请求样本；
-- `merge_datasets.py`：用于合并不同来源的数据集，并统一标签名称；
-- `stat_pkdd_labels.py`：用于统计 PKDD 2007 数据集中的标签分布；
-- `decode_utils.py`：用于 URL 解码、HTML 实体解码、Unicode 解码、Base64 解码和文本归一化。
+- `merge_datasets.py`：用于合并不同来源的数据集，并统一标签名称。
 
 处理后的 HTTP 请求统一表示为：
 
-~~~text
+```text
 [METHOD] ... [URI] ... [COOKIE] ... [REFERER] ... [BODY] ...
-~~~
+```
 
-### 4.2 领域继续预训练模块
+该统一表示方式能够将不同来源、不同格式的数据转化为相同的文本输入形式，便于后续模型训练和对比实验。
+
+### 领域继续预训练模块
 
 领域继续预训练代码主要位于：
 
-~~~text
+```text
 dapt/
-~~~
+```
 
 其中：
 
@@ -113,53 +97,64 @@ dapt/
 - `merge_pretrain_corpus.py`：用于合并多来源预训练语料；
 - `train_mlm.py`：用于基于 MLM 任务对 RoBERTa 进行领域继续预训练。
 
-### 4.3 主模型训练模块
+领域继续预训练的目标是使 RoBERTa 更好地适应 HTTP 请求、攻击载荷、特殊符号和 Web 安全语义特征。
+
+### 主模型模块
 
 主模型相关代码主要位于：
 
-~~~text
+```text
 classification/
-~~~
+```
 
 其中：
 
-- `model.py`：定义 RoBERTa-TextCNN 模型结构；
+- `config.py`：保存主模型训练相关配置；
 - `dataset.py`：定义 RoBERTa 输入数据集；
+- `model.py`：定义 RoBERTa-TextCNN 模型结构；
 - `train.py`：训练 RoBERTa-TextCNN 主模型；
 - `evaluate.py`：模型评估函数；
 - `predict.py`：使用训练好的模型进行单条 HTTP 请求检测。
 
-### 4.4 对比实验模块
+主模型流程如下：
+
+```text
+HTTP 请求文本
+    ↓
+RoBERTa 语义特征提取
+    ↓
+TextCNN 局部特征提取
+    ↓
+Dropout + Linear 分类
+    ↓
+输出检测类别
+```
+
+### 对比实验模块
 
 对比实验代码位于：
 
-~~~text
+```text
 classification/baselines/
-~~~
+```
+这些对比实验用于验证不同模型结构在 Web 攻击检测任务中的表现，并分析领域继续预训练和 TextCNN 局部特征提取模块的作用。
 
-包括：
+### 公共工具模块
 
-- `train_bert_only.py`
-- `train_roberta_only.py`
-- `train_roberta_dapt_only.py`
-- `train_textcnn.py`
-- `train_bilstm.py`
+公共工具代码主要位于：
 
-这些代码用于对比不同模型结构在 Web 攻击检测任务中的表现。
+```text
+classification/common/
+utils/
+```
 
-## 5. 环境依赖
+## 环境依赖
 
-建议使用 Python 3.8 及以上版本。
-
-安装依赖：
-
-~~~bash
-pip install -r requirements.txt
-~~~
+建议使用 Python 3.10版本。
 
 主要依赖包括：
 
-~~~text
+```text
 torch
 transformers
 datasets
@@ -167,15 +162,19 @@ pandas
 numpy
 scikit-learn
 tqdm
-~~~
+```
 
-## 6. 数据准备
+安装依赖：
 
-由于数据集版权、体积及安全原因，本仓库不直接提供完整原始数据集和模型权重文件。
+```bash
+pip install -r requirements.txt
+```
+
+## 数据准备
 
 请将原始数据集按以下结构放置：
 
-~~~text
+```text
 data/
 ├── raw/
 │   ├── csic2012/
@@ -191,109 +190,34 @@ data/
 │       └── honeypot/
 │
 └── processed/
-~~~
+```
 
-## 7. 数据处理流程
+其中：
 
-### 7.1 提取 CSIC 2012 数据
+- `data/raw/csic2012/`：存放 CSIC 2012 原始数据；
+- `data/raw/pkdd2007/`：存放 PKDD 2007 原始数据；
+- `data/raw/dapt/`：存放领域继续预训练相关语料；
+- `data/processed/`：存放预处理后的训练数据。
 
-~~~bash
-python classification/data_process/extract_csic2012.py
-~~~
+## 使用训练好的模型进行检测
 
-### 7.2 提取 PKDD 2007 数据
+使用 `classification/predict.py` 可以对单条 HTTP 请求进行检测。
 
-~~~bash
-python classification/data_process/extract_pkdd2007.py
-~~~
+GET 请求示例：
 
-### 7.3 合并分类数据集
-
-~~~bash
-python classification/data_process/merge_datasets.py
-~~~
-
-生成文件：
-
-~~~text
-data/processed/merged_two.csv
-~~~
-
-## 8. 领域继续预训练
-
-### 8.1 构造继续预训练语料
-
-~~~bash
-python dapt/prepare_owasp_corpus.py
-python dapt/prepare_honeypot_corpus.py
-python dapt/merge_pretrain_corpus.py
-~~~
-
-### 8.2 运行 MLM 继续预训练
-
-~~~bash
-python dapt/train_mlm.py
-~~~
-
-继续预训练后的模型默认保存到：
-
-~~~text
-outputs/dapt_lr_search/
-~~~
-
-## 9. 训练主模型
-
-~~~bash
-python classification/train.py
-~~~
-
-训练结果默认保存到：
-
-~~~text
-outputs/classification/roberta_textcnn/
-~~~
-
-主要输出包括：
-
-~~~text
-best_model.pt
-label_mapping.json
-best_metrics.json
-test_metrics.json
-classification_report.txt
-classification_report.json
-confusion_matrix.csv
-train_history.csv
-model_config.json
-~~~
-
-## 10. 运行对比实验
-
-~~~bash
-python classification/baselines/train_bert_only.py
-python classification/baselines/train_roberta_only.py
-python classification/baselines/train_roberta_dapt_only.py
-python classification/baselines/train_textcnn.py
-python classification/baselines/train_bilstm.py
-~~~
-
-## 11. 使用训练好的模型进行检测
-
-示例：
-
-~~~bash
+```bash
 python classification/predict.py \
   --method GET \
   --uri "/index.php?id=1' or '1'='1"
-~~~
+```
 
 POST 请求示例：
 
-~~~bash
+```bash
 python classification/predict.py \
   --method POST \
   --uri "/login.php" \
   --body "username=admin' or '1'='1&password=123456"
-~~~
+```
 
 输出结果包括预测类别、置信度以及各类别概率。
