@@ -17,7 +17,7 @@
 RoBERTa-TextCNN-WebAttackDetection/
 │
 ├── README.md
-│
+│── requirements.txt
 ├── classification/
 │   ├── config.py
 │   ├── dataset.py
