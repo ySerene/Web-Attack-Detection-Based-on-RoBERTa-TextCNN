@@ -25,6 +25,7 @@ RoBERTa-TextCNN-WebAttackDetection/
 │   ├── model.py
 │   ├── predict.py
 │   ├── train.py
+│   ├── tune_roberta_textcnn.py
 │   │
 │   ├── data_process/
 │   │   ├── extract_csic2012.py
@@ -55,8 +56,9 @@ RoBERTa-TextCNN-WebAttackDetection/
 └── utils/
     ├── metrics.py
     ├── seed.py
-    └── utils.py
-```
+    ├── utils.py
+    └── plot_confusion_matrix.py
+``` 
 
 ## 模块说明
 
@@ -113,6 +115,7 @@ classification/
 - `dataset.py`：定义 RoBERTa 输入数据集；
 - `model.py`：定义 RoBERTa-TextCNN 模型结构；
 - `train.py`：训练 RoBERTa-TextCNN 主模型；
+- `tune_roberta_textcnn.py`：调参；
 - `evaluate.py`：模型评估函数；
 - `predict.py`：使用训练好的模型进行单条 HTTP 请求检测。
 
