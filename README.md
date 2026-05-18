@@ -223,8 +223,8 @@ python classification/predict.py \
 输出结果包括预测类别、置信度以及各类别概率。
 
 ##项目声明
-项目名称：基于RoBERTa-TextCNN的Web攻击检测方法
-项目作者：Yang Xin
-作者单位：暨南大学网络空间安全学院
-开发语言：Python
-核心技术：Web攻击检测、深度学习、RoBERTa模型、卷积神经网络
+-项目名称：基于RoBERTa-TextCNN的Web攻击检测方法
+-项目作者：Yang Xin
+-作者单位：暨南大学网络空间安全学院
+-开发语言：Python
+-核心技术：Web攻击检测、深度学习、RoBERTa模型、卷积神经网络
